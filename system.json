@@ -12,8 +12,8 @@
             "path": "/usr/local/share/universal-ssh-gui.html"
         },
         {
-            "name": "universal-ssh-gui-server.py"
-            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-gui-server.py"
+            "name": "universal-ssh-gui-server.py",
+            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-gui-server.py",
             "path": "/usr/local/share/universal-ssh-gui-server.py"
         },
         {
@@ -30,7 +30,7 @@
         {
             "path": "/usr/local/share/universal-ssh-gui.html",
             "chmod": "644"
-        }
+        },
         {
             "path": "/usr/local/share/universal-ssh-gui-server.py",
             "chmod": "700"

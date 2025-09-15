@@ -2,14 +2,14 @@
     "version": "1.0.0",
     "files": [
         {
-            "name": "main.py",
-            "url": "https://raw.githubusercontent.com/<your-repo>/main.py",
-            "path": "/opt/mysystem/main.py"
+            "name": "universal-ssh-keys.cfg",
+            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-keys.cfg",
+            "path": "/etc/pve/universal-ssh-keys.cfg"
         },
         {
-            "name": "config.json",
-            "url": "https://raw.githubusercontent.com/<your-repo>/config.json",
-            "path": "/opt/mysystem/config.json"
+            "name": "apply-universal-keys.sh",
+            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/apply-universal-keys.sh",
+            "path": "/usr/local/bin/apply-universal-keys.sh"
         }
     ],
     "permissions": [

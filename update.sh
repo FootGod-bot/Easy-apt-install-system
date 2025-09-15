@@ -10,7 +10,7 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # --- Configuration ---
-JSON_URL="https://raw.githubusercontent.com/<your-repo>/system.json"
+JSON_URL="https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/system.json"
 INSTALL_DIR="/opt/mysystem"
 CURRENT_VERSION_FILE="$INSTALL_DIR/version.txt"
 

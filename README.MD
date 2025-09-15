@@ -13,5 +13,5 @@ but replace it with your link to the install.sh. Update is
 ```bash <(curl -sL https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/update.sh)```
 and uninstall is
 ```bash <(curl -sL https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/uninstall.sh)```
-.
+. These are going to run the script without perm downloading it.
 # Enjoy

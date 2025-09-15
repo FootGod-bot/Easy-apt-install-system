@@ -7,6 +7,16 @@
             "path": "/etc/pve/universal-ssh-keys.cfg"
         },
         {
+            "name": "universal-ssh-gui.html",
+            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-gui.html",
+            "path": "/usr/local/share/universal-ssh-gui.html"
+        },
+        {
+            "name": "universal-ssh-gui-server.py"
+            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-gui-server.py"
+            "path": "/usr/local/share/universal-ssh-gui-server.py"
+        },
+        {
             "name": "apply-universal-keys.sh",
             "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/apply-universal-keys.sh",
             "path": "/usr/local/bin/apply-universal-keys.sh"
@@ -14,24 +24,26 @@
     ],
     "permissions": [
         {
-            "path": "/opt/mysystem/main.py",
-            "chmod": "755"
+            "path": "/usr/local/bin/apply-universal-keys.sh",
+            "chmod": "700"
         },
         {
-            "path": "/opt/mysystem/config.json",
+            "path": "/usr/local/share/universal-ssh-gui.html",
             "chmod": "644"
+        }
+        {
+            "path": "/usr/local/share/universal-ssh-gui-server.py",
+            "chmod": "700"
         }
     ],
     "python_requirements": [
-        "requests",
         "flask"
     ],
     "apt_requirements": [
         "curl",
         "wget",
-        "vim",
-        "git",
+        "jq",
         "python3-pip"
     ],
-    "changelog": "https://raw.githubusercontent.com/<your-repo>/CHANGELOG.md"
+    "changelog": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/CHANGELOG.md"
 }

@@ -1,13 +1,37 @@
 {
-    "version": "1.0.2",
+    "version": "1.0.0",
     "files": [
         {
             "name": "main.py",
-            "url": "https://raw.githubusercontent.com/<your-repo>/main.py"
+            "url": "https://raw.githubusercontent.com/<your-repo>/main.py",
+            "path": "/opt/mysystem/main.py"
         },
         {
             "name": "config.json",
-            "url": "https://raw.githubusercontent.com/<your-repo>/config.json"
+            "url": "https://raw.githubusercontent.com/<your-repo>/config.json",
+            "path": "/opt/mysystem/config.json"
         }
-    ]
+    ],
+    "permissions": [
+        {
+            "path": "/opt/mysystem/main.py",
+            "chmod": "755"
+        },
+        {
+            "path": "/opt/mysystem/config.json",
+            "chmod": "644"
+        }
+    ],
+    "python_requirements": [
+        "requests",
+        "flask"
+    ],
+    "apt_requirements": [
+        "curl",
+        "wget",
+        "vim",
+        "git",
+        "python3-pip"
+    ],
+    "changelog": "https://raw.githubusercontent.com/<your-repo>/CHANGELOG.md"
 }

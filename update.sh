@@ -14,14 +14,14 @@ JSON_URL="https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/
 INSTALL_DIR="/opt/mysystem"
 CURRENT_VERSION_FILE="$INSTALL_DIR/version.txt"
 
-# --- Check for service flag ---
+# --- Service mode ---
 SKIP_DOWNLOAD=0
 if [ "$1" == "--service" ]; then
     SKIP_DOWNLOAD=1
     log "Running in service mode: skipping file downloads."
 fi
 
-# --- Fetch system.json if not in service mode ---
+# --- Fetch system.json ---
 if [ $SKIP_DOWNLOAD -eq 0 ]; then
     log "Fetching system.json..."
     curl -s -o /tmp/system.json "$JSON_URL"
@@ -30,34 +30,35 @@ fi
 # --- Determine version ---
 NEW_VERSION=$(jq -r '.version' /tmp/system.json)
 CURRENT_VERSION="0"
-if [ -f "$CURRENT_VERSION_FILE" ]; then
-    CURRENT_VERSION=$(cat "$CURRENT_VERSION_FILE")
-fi
+[ -f "$CURRENT_VERSION_FILE" ] && CURRENT_VERSION=$(cat "$CURRENT_VERSION_FILE")
 
 if [ "$CURRENT_VERSION" == "$NEW_VERSION" ] && [ $SKIP_DOWNLOAD -eq 0 ]; then
     log "System already up to date (version $CURRENT_VERSION). Exiting."
     exit 0
 fi
 
-if [ $SKIP_DOWNLOAD -eq 0 ]; then
-    log "Updating from version $CURRENT_VERSION to $NEW_VERSION..."
-fi
+[ $SKIP_DOWNLOAD -eq 0 ] && log "Updating from version $CURRENT_VERSION to $NEW_VERSION..."
 
 # --- Install apt requirements ---
 if [ $SKIP_DOWNLOAD -eq 0 ]; then
     APT_PACKAGES=$(jq -r '.apt_requirements[]?' /tmp/system.json)
-    if [ ! -z "$APT_PACKAGES" ]; then
-        log "Installing apt packages..."
-        apt update && apt install -y $APT_PACKAGES
-    fi
+    [ ! -z "$APT_PACKAGES" ] && apt update && apt install -y $APT_PACKAGES
 fi
 
 # --- Install Python requirements ---
 if [ $SKIP_DOWNLOAD -eq 0 ]; then
     PYTHON_PACKAGES=$(jq -r '.python_requirements[]?' /tmp/system.json)
     if [ ! -z "$PYTHON_PACKAGES" ]; then
-        log "Installing/updating Python packages..."
-        pip3 install --upgrade $PYTHON_PACKAGES
+        for pkg in $PYTHON_PACKAGES; do
+            pip3 install --upgrade $pkg || {
+                echo "⚠️ Python package $pkg failed (PEP 668)."
+                read -p "Continue with --break-system-packages? (y/N): " choice
+                case "$choice" in
+                    y|Y ) pip3 install --break-system-packages $pkg ;;
+                    * ) echo "Skipping $pkg" ;;
+                esac
+            }
+        done
     fi
 fi
 
@@ -67,8 +68,7 @@ if [ $SKIP_DOWNLOAD -eq 0 ]; then
     for file in $FILES; do
         FILE_URL=$(echo "$file" | jq -r '.url')
         FILE_PATH=$(echo "$file" | jq -r '.path')
-        FILE_DIR=$(dirname "$FILE_PATH")
-        mkdir -p "$FILE_DIR"
+        mkdir -p "$(dirname "$FILE_PATH")"
         log "Downloading $FILE_URL to $FILE_PATH..."
         curl -s -L -o "$FILE_PATH" "$FILE_URL"
     done
@@ -88,16 +88,10 @@ fi
 # --- Download changelog ---
 if [ $SKIP_DOWNLOAD -eq 0 ]; then
     CHANGELOG_URL=$(jq -r '.changelog?' /tmp/system.json)
-    if [ ! -z "$CHANGELOG_URL" ]; then
-        mkdir -p "$INSTALL_DIR"
-        log "Downloading changelog..."
-        curl -s -L -o "$INSTALL_DIR/CHANGELOG.md" "$CHANGELOG_URL"
-    fi
+    [ ! -z "$CHANGELOG_URL" ] && mkdir -p "$INSTALL_DIR" && curl -s -L -o "$INSTALL_DIR/CHANGELOG.md" "$CHANGELOG_URL"
 fi
 
 # --- Update version file ---
-if [ $SKIP_DOWNLOAD -eq 0 ]; then
-    echo "$NEW_VERSION" > "$CURRENT_VERSION_FILE"
-fi
+[ $SKIP_DOWNLOAD -eq 0 ] && echo "$NEW_VERSION" > "$CURRENT_VERSION_FILE"
 
 log "Update complete!"

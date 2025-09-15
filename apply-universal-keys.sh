@@ -4,7 +4,14 @@ CONFIG_FILE="/etc/pve/universal-ssh-keys.cfg"
 # Load keys
 DATACENTER_KEYS=$(awk '/keys = \[/{flag=1;next}/\]/{flag=0}flag' $CONFIG_FILE | tr -d '", ')
 
-# Apply keys to node
+# Load static IPs
+declare -A VM_STATIC_IPS
+while IFS='=' read -r vm ip; do
+    [[ "$vm" =~ ^[0-9]+$ ]] || continue
+    VM_STATIC_IPS[$vm]=$ip
+done < <(awk '/\[static_ips\]/ {f=1; next} /^\[/ {f=0} f && /=/ {print}' $CONFIG_FILE)
+
+# Apply keys to node root
 mkdir -p /root/.ssh
 touch /root/.ssh/authorized_keys
 for KEY in $DATACENTER_KEYS; do
@@ -12,44 +19,50 @@ for KEY in $DATACENTER_KEYS; do
 done
 sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 systemctl reload sshd
+echo "Applied keys to node root and disabled password SSH"
 
-# Apply keys & reboot VMs in order
+# Get list of VMs
 VMIDS=$(qm list | awk 'NR>1 {print $1}' | sort -n)
 
 for VMID in $VMIDS; do
-    # Skip if no cloud-init
     if ! qm config $VMID | grep -q "ciuser:"; then
         continue
     fi
 
-    # Try cloud-init injection first
+    # Apply keys via cloud-init
     for KEY in $DATACENTER_KEYS; do
         qm set $VMID --sshkeys "$KEY"
     done
 
     # Reboot VM
     echo "Rebooting VM $VMID..."
-    qm reboot $VMID
+    qm reboot $VMID 2>/dev/null || qm start $VMID 2>/dev/null
 
-    # Wait for IP via QEMU guest agent
-    VM_IP=""
-    while [ -z "$VM_IP" ]; do
-        sleep 5
-        VM_IP=$(qm guest exec $VMID -- ip addr show eth0 | grep -Po 'inet \K[\d.]+' || echo "")
-    done
+    # Determine IP
+    VM_IP=${VM_STATIC_IPS[$VMID]}
 
-    # Wait until VM responds to ping
+    if [ -z "$VM_IP" ]; then
+        echo "VM $VMID uses DHCP, waiting for QEMU guest agent..."
+        while true; do
+            VM_IP=$(qm guest exec $VMID -- ip addr show eth0 2>/dev/null | grep -Po 'inet \K[\d.]+' || echo "")
+            [ -n "$VM_IP" ] && break
+            sleep 5
+        done
+    fi
+
+    # Wait for network up
     while ! ping -c 1 -W 1 "$VM_IP" >/dev/null 2>&1; do
-        echo "Waiting for VM $VMID to be online..."
+        echo "Waiting for VM $VMID ($VM_IP) to be online..."
         sleep 5
     done
 
-    # Push keys via SSH if cloud-init somehow missed
+    # Push keys via SSH if needed
     for KEY in $DATACENTER_KEYS; do
-        ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa root@"$VM_IP" "grep -qxF '$KEY' ~/.ssh/authorized_keys || echo '$KEY' >> ~/.ssh/authorized_keys"
+        ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa root@"$VM_IP" \
+            "grep -qxF '$KEY' ~/.ssh/authorized_keys || echo '$KEY' >> ~/.ssh/authorized_keys"
     done
 
     echo "VM $VMID is online and keys applied!"
 done
 
-echo "All VMs updated and online."
+echo "All VMs updated successfully."

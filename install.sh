@@ -10,7 +10,7 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # --- Configuration ---
-JSON_URL="https://raw.githubusercontent.com/<your-repo>/system.json"
+JSON_URL="https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/system.json"
 SERVICE_NAME="mysystem-updater"
 SERVICE_COMMAND="curl -fsSL https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/update.sh | bash"
 SERVICE_INTERVAL=30

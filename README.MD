@@ -1,1 +1,1 @@
-```curl -fsSL https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/install.sh | bash```
+# How to set up the Easy Apt Replacer

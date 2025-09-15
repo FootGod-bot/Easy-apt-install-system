@@ -3,6 +3,19 @@ set -e
 
 log() { echo "[*] $1"; }
 
+install_python_package() {
+    PACKAGE=$1
+    if ! pip3 install $PACKAGE; then
+        echo "⚠️ Python package $PACKAGE failed to install."
+        read -p "Try installing it with --break-system-packages? [y/N]: " choice
+        if [[ "$choice" =~ ^[Yy]$ ]]; then
+            pip3 install --break-system-packages $PACKAGE
+        else
+            echo "Skipping $PACKAGE."
+        fi
+    fi
+}
+
 # --- Ensure jq is installed ---
 if ! command -v jq &> /dev/null; then
     log "jq not found. Installing..."
@@ -29,19 +42,9 @@ fi
 
 # --- Install Python requirements ---
 PYTHON_PACKAGES=$(jq -r '.python_requirements[]?' /tmp/system.json)
-if [ ! -z "$PYTHON_PACKAGES" ]; then
-    log "Installing Python packages..."
-    for pkg in $PYTHON_PACKAGES; do
-        pip3 install $pkg || {
-            echo "⚠️ Python package $pkg failed to install system-wide (PEP 668)."
-            read -p "Do you want to continue with --break-system-packages? (y/N): " choice
-            case "$choice" in
-                y|Y ) pip3 install --break-system-packages $pkg ;;
-                * ) echo "Skipping $pkg" ;;
-            esac
-        }
-    done
-fi
+for pkg in $PYTHON_PACKAGES; do
+    install_python_package $pkg
+done
 
 # --- Download files ---
 FILES=$(jq -c '.files[]' /tmp/system.json)

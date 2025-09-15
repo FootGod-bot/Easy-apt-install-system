@@ -31,7 +31,16 @@ fi
 PYTHON_PACKAGES=$(jq -r '.python_requirements[]?' /tmp/system.json)
 if [ ! -z "$PYTHON_PACKAGES" ]; then
     log "Installing Python packages..."
-    pip3 install $PYTHON_PACKAGES
+    for pkg in $PYTHON_PACKAGES; do
+        pip3 install $pkg || {
+            echo "⚠️ Python package $pkg failed to install system-wide (PEP 668)."
+            read -p "Do you want to continue with --break-system-packages? (y/N): " choice
+            case "$choice" in
+                y|Y ) pip3 install --break-system-packages $pkg ;;
+                * ) echo "Skipping $pkg" ;;
+            esac
+        }
+    done
 fi
 
 # --- Download files ---
@@ -62,7 +71,7 @@ if [ ! -z "$CHANGELOG_URL" ]; then
     curl -s -L -o "$INSTALL_DIR/CHANGELOG.md" "$CHANGELOG_URL"
 fi
 
-# --- Create systemd service (runs update.sh in service mode) ---
+# --- Create systemd service ---
 log "Creating systemd service $SERVICE_NAME..."
 cat <<EOF > /etc/systemd/system/$SERVICE_NAME.service
 [Unit]

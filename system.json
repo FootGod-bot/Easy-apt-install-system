@@ -1,0 +1,13 @@
+{
+    "version": "1.0.2",
+    "files": [
+        {
+            "name": "main.py",
+            "url": "https://raw.githubusercontent.com/<your-repo>/main.py"
+        },
+        {
+            "name": "config.json",
+            "url": "https://raw.githubusercontent.com/<your-repo>/config.json"
+        }
+    ]
+}

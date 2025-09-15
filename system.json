@@ -3,36 +3,22 @@
     "files": [
         {
             "name": "universal-ssh-keys.cfg",
-            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-keys.cfg",
-            "path": "/etc/pve/universal-ssh-keys.cfg"
+            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/example.cfg",
+            "path": "/etc/pve/example.cfg"
         },
         {
-            "name": "universal-ssh-gui.html",
-            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-gui.html",
-            "path": "/usr/local/share/universal-ssh-gui.html"
-        },
-        {
-            "name": "universal-ssh-gui-server.py",
-            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/universal-ssh-gui-server.py",
-            "path": "/usr/local/share/universal-ssh-gui-server.py"
-        },
-        {
-            "name": "apply-universal-keys.sh",
-            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/apply-universal-keys.sh",
-            "path": "/usr/local/bin/apply-universal-keys.sh"
+            "name": "example",
+            "url": "https://raw.githubusercontent.com/FootGod-bot/Universal-ssh-keys/refs/heads/main/example.sh",
+            "path": "/usr/local/share/example.html"
         }
     ],
     "permissions": [
         {
-            "path": "/usr/local/bin/apply-universal-keys.sh",
+            "path": "/usr/local/bin/example.sh",
             "chmod": "700"
         },
         {
-            "path": "/usr/local/share/universal-ssh-gui.html",
-            "chmod": "644"
-        },
-        {
-            "path": "/usr/local/share/universal-ssh-gui-server.py",
+            "path": "/usr/local/share/example.py",
             "chmod": "700"
         }
     ],

@@ -12,7 +12,7 @@ def apply_keys():
     data = request.json
     keys = data.get('keys', [])
 
-    # Overwrite config
+    # Write config
     with open('/etc/pve/universal-ssh-keys.cfg','w') as f:
         f.write('[datacenter]\nenabled = 1\nkeys = [\n')
         for k in keys:
@@ -22,9 +22,8 @@ def apply_keys():
             f.write(f'"{k}",\n')
         f.write(']\n')
 
-    # Apply keys + reboot + wait
+    # Run apply script
     subprocess.run(['/usr/local/bin/apply-universal-keys.sh'])
 
-    return "Keys applied, VMs rebooted in order, all online."
+    return "Keys applied, VMs rebooted, and online."
 
-app.run(host='0.0.0.0', port=5000)

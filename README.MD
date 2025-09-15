@@ -1,1 +1,1 @@
-# How to set up the Easy Apt Replacer
+## How to set up the Easy Apt Replacer
